@@ -1,0 +1,147 @@
+import pygame
+import time
+pygame.font.init()
+from pygame import mixer
+mixer.init()
+pygame.init()
+
+#Sound
+sfx = mixer.Sound("WolfHowl.mp3")
+
+WIDTH = 640
+HEIGHT = 480
+SIZE = (WIDTH, HEIGHT)
+screen = pygame.display.set_mode(SIZE)
+clock = pygame.time.Clock()
+
+#--------------
+# POSITIONING & VARIABLES
+disclaimer = 1
+
+cloud1_x = 300
+cloud12_x = 450
+cloud2_x = 150
+cloud22_x = -50
+
+cloud_color_day = 255, 255, 255
+cloud_color_night = 100, 114, 115
+
+sun_x = 0 # Position for sun and moon
+
+cycle = 0
+# 0 = Day
+# 1 = Night
+
+wolf_x = 600
+wolf_head_raise = 45
+wolf_head_raise1 = 150
+
+eye1_x = wolf_x - 35
+eye2_x = wolf_x
+
+eye1_y = 165
+eye2_y = 165
+#--------------
+
+running = True
+while running:
+    # EVENT HANDLING
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+    # BACKGROUNDS
+    if disclaimer == 1:
+        screen.fill((0, 0, 0))
+        font = pygame.font.SysFont("Arial", 32)
+        message = font.render("Download WolfHowl.mp3. Turn volume on.", True, (255, 255, 255))
+        screen.blit(message, (20, 200))
+        pygame.display.update()
+        time.sleep(5)
+        disclaimer -= 1
+
+    if cycle == 0:
+        screen.fill((0, 219, 235))
+    
+    if cycle == 1:
+        screen.fill((4, 9, 51))
+
+    # DRAWINGS
+    cliff = pygame.draw.rect(screen, (99, 38, 21), pygame.Rect(200, 200, 500, 300))
+
+    grass1 = pygame.draw.ellipse(screen, (51, 128, 65), pygame.Rect(200, 150, 250, 100))
+    grass2 = pygame.draw.ellipse(screen, (51, 128, 65), pygame.Rect(400, 150, 250, 100))
+
+    if cycle == 1:
+        wolf_body = pygame.draw.ellipse(screen, (82, 74, 74), pygame.Rect(wolf_x, 150, 100, 60))
+        wolf_head = pygame.draw.ellipse(screen, (82, 74, 74), pygame.Rect(wolf_x - 30, wolf_head_raise1, 60, wolf_head_raise))
+        wolf_leg1 = pygame.draw.ellipse(screen, (82, 74, 74), pygame.Rect(wolf_x, 175, 30, 50))
+        wolf_leg2 = pygame.draw.ellipse(screen, (82, 74, 74), pygame.Rect(wolf_x + 75, 175, 30, 50))
+        wolf_eye1 = pygame.draw.ellipse(screen, (0, 0, 0), pygame.Rect(eye1_x, eye1_y, 15, 15))
+        wolf_eye2 = pygame.draw.ellipse(screen, (0, 0, 0), pygame.Rect(eye2_x, eye2_y, 15, 15))
+        if wolf_x > 210:
+            eye1_x = wolf_x - 35
+            eye2_x = wolf_x
+            eye1_y = 165
+            eye2_y = 165
+            wolf_x -= 2
+        elif wolf_x <= 210:
+            wolf_mouth = pygame.draw.ellipse(screen, (4, 9, 51), pygame.Rect(190, 115, 30, 70))
+            wolf_head_raise = 70
+            wolf_head_raise1 = 125
+            eye1_x = 225
+            eye1_y = 140
+            eye2_x = 225
+            eye2_y = 160
+            mixer.Sound.play(sfx)
+    
+    if cycle == 0:
+        cloud1 = pygame.draw.ellipse(screen, (cloud_color_day), pygame.Rect(cloud1_x, 20, 200, 100))
+        cloud12 = pygame.draw.ellipse(screen, (cloud_color_day), pygame.Rect(cloud12_x, 60, 200, 75))
+        cloud2 = pygame.draw.ellipse(screen, (cloud_color_day), pygame.Rect(cloud2_x, 60, 100, 50))
+        cloud22 = pygame.draw.ellipse(screen, (cloud_color_day), pygame.Rect(cloud22_x, 20, 250, 100))
+        sun = pygame.draw.ellipse(screen, (252, 186, 3), pygame.Rect(sun_x, 30, 100, 100))
+        wolf_x = 600
+        wolf_head_raise = 45
+        wolf_head_raise1 = 150
+        sun_x += 2
+    elif cycle == 1:
+        cloud1 = pygame.draw.ellipse(screen, (cloud_color_night), pygame.Rect(cloud1_x, 20, 200, 100))
+        cloud12 = pygame.draw.ellipse(screen, (cloud_color_night), pygame.Rect(cloud12_x, 60, 200, 75))
+        cloud2 = pygame.draw.ellipse(screen, (cloud_color_night), pygame.Rect(cloud2_x, 60, 100, 50))
+        cloud22 = pygame.draw.ellipse(screen, (cloud_color_night), pygame.Rect(cloud22_x, 20, 250, 100))
+        moon = pygame.draw.ellipse(screen, (206, 206, 206), pygame.Rect(sun_x, 30, 100, 100))
+        moon_pit1 = pygame.draw.ellipse(screen, (79, 79, 79), pygame.Rect(sun_x + 60, 50, 20, 20))
+        moon_pit1 = pygame.draw.ellipse(screen, (79, 79, 79), pygame.Rect(sun_x + 20, 85, 30, 30))
+        sun_x += 1
+
+    # MOVEMENTS
+
+    if sun_x > 600 and cycle == 0:
+        sun_x = 0
+        cycle = 1
+
+    elif sun_x > 600 and cycle == 1:
+        sun_x = 0
+        cycle = 0
+
+    cloud1_x += 2
+    if cloud1_x > 600:
+        cloud1_x = 0
+
+    cloud12_x += 3
+    if cloud12_x > 600:
+        cloud12_x = 0
+
+    cloud2_x += 1.5
+    if cloud2_x > 600:
+        cloud2_x = 0
+
+    cloud22_x += 1.5
+    if cloud22_x > 600:
+        cloud22_x = 0
+
+    pygame.display.flip()
+    clock.tick(30)
+pygame.quit()
